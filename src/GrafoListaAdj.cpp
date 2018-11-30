@@ -1,6 +1,11 @@
 #include "GrafoListaAdj.h"
 #include <list>
+#include <stdlib.h>
+#include <stdio.h>
+#include <values.h>
 
+using namespace std;
+const int INF = INT_MAX/2;
 
 GrafoListaAdj::GrafoListaAdj()
 {
@@ -190,15 +195,15 @@ void GrafoListaAdj::imprimeSequenciaGraus() {
 
     int k = 0;
     for(it = this->vertices.begin(); it!=this->vertices.end(); ++it) {
-        graus[k] = it->getGrau();
+        graus[k] = (int) it->getGrau();
+        k++;
     }
 
     //ordena��o do vetor em ordem decrescente
-    int aux;
     for(int i = 0; i<numVertices; i++) {
         for(int j = i+1; j<numVertices; j++) {
             if(graus[i] < graus[j]) {
-                aux = graus[i];
+                int aux = graus[i];
                 graus[i] = graus[j];
                 graus[j] = aux;
             }
@@ -227,7 +232,7 @@ void GrafoListaAdj::defineCor(Vertice v){
 int GrafoListaAdj::getPesoAresta(int id_vertice_1, int id_vertice_2)
 {
     list<Vertice>::iterator it;
-    int peso_aresta_1, peso_aresta_2; // irá armazenar o peso salvo nas arestas dentro de cada vertice
+    int peso_aresta_1 = 1, peso_aresta_2 = 2; // irá armazenar o peso salvo nas arestas dentro de cada vertice
     for(it = vertices.begin(); it != vertices.end(); ++it) {
         if(it->getID() == id_vertice_1) {
             for(Aresta* a = it->getListaArestas(); a != NULL; a = a->getProx()) {
@@ -248,11 +253,10 @@ int GrafoListaAdj::getPesoAresta(int id_vertice_1, int id_vertice_2)
 
     }
     if(peso_aresta_1 == peso_aresta_2) {
-        cout << "getPesoAresta funcionou!" << endl;
         return peso_aresta_1;
     } else {
-        cout << "getPesoAresta pesos das arestas nao batem (talvez sejam direcionadas ou nao existe aresta): return 0" << endl;
-        return 0;
+        //retorna o maior valor inteiro possível para representar a ausencia de aresta
+        return INF;
     }
 }
 
@@ -347,11 +351,32 @@ bool GrafoListaAdj::isMultigrafo() {
 }
 */
 
-void GrafoListaAdj::sequenciaGrau() {
-    list <Vertice>::iterator it;
-    cout<<endl<<"[";
-    for(it = this->vertices.begin(); it != this->vertices.end(); ++it){
-        cout << it->getGrau()<< ", " ;
+int** GrafoListaAdj::geraMatrizesFloyd() {
+    int n = getOrdem();
+    int** distancias = (int **) malloc(sizeof(int *) * n);
+    for(int i=0; i < n; i++){
+        distancias[i] = (int *) malloc(sizeof(int) * n);
     }
-    cout<<"]" <<endl;
+
+    for(int i = 0; i<n; i++){
+        for(int j = 0; j<n; j++){
+            if(i==j)
+                distancias[i][j] = 0;
+            else
+                distancias[i][j] = this->getPesoAresta(i+1, j+1);
+        }
+    }
+
+    for(int aux = 0; aux < n; aux++)
+        for(int i = 0; i < n; i++)
+            for(int j = 0; j<n; j++)
+                if(distancias[i][j] > distancias[i][aux] + distancias[aux][j])
+                    distancias[i][j] = distancias[i][aux] + distancias[aux][j];
+
+    return distancias;
+}
+
+int GrafoListaAdj::caminhoMinimoFloyd(int id_origem, int id_destino) {
+    int** distancias = geraMatrizesFloyd();
+    return distancias[id_origem-1][id_destino-1];
 }

@@ -8,8 +8,7 @@
 using namespace std;
 /*
 *
-*@Author Jo�o Victor Lopes Fam
-*
+*@Author grupo11
 *
 */
 
@@ -20,6 +19,8 @@ private:
     int k; //Quantidade de cores
     bool trivial;
     bool nulo = false;
+
+    int** geraMatrizesFloyd();
 
 
 public:
@@ -63,7 +64,8 @@ public:
 
     GrafoListaAdj algoritmoKruskal();
     bool isBipartido();
-    void sequenciaGrau();
+
+    int caminhoMinimoFloyd(int id_origem, int id_destino);
 
 };
 
