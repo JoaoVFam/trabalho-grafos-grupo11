@@ -74,6 +74,7 @@ public:
 
     list<int> fechoTransitivoDireto(int id_vertice);
     list<int> fechoTransitivoIndireto(int id_vertice);
+    list<int> ordenacaoTopologica();
 
 };
 

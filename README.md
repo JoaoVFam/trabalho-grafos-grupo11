@@ -18,13 +18,13 @@ O TAD ou classe deve apresentar as seguintes funcionalidades
 - [x] verificar se o grafo é completo
 - [x] verificar se o grafo é bipartido
 - [x] apresentar a sequência de graus
-- [ ] apresentar o fecho transitivo direto (para digrafos)
-- [ ] apresentar o fecho transitivo indireto (para digrafos)
-- [ ] apresentar uma ordenação topológica (para digrafos)
+- [x] apresentar o fecho transitivo direto (para digrafos)
+- [x] apresentar o fecho transitivo indireto (para digrafos)
+- [x] apresentar uma ordenação topológica (para digrafos)
 - [ ] apresentar uma árvore geradora mínima usando o algoritmo de Kruskal
 - [ ] apresentar uma árvore geradora mínima usando o algoritmo de Prim
 - [ ] apresentar o custo do caminho mínimo entre dois vértices informados pelo usuário usando o algoritmo de Dijkstra
-- [ ] apresentar o custo do caminho mínimo entre dois vértices informados pelo usuário usando o algoritmo de Floyd
+- [x] apresentar o custo do caminho mínimo entre dois vértices informados pelo usuário usando o algoritmo de Floyd
 
 #### Fase 2:
 
