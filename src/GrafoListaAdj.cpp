@@ -4,8 +4,9 @@
 #include <stdio.h>
 #include <values.h>
 
-using namespace std;
 const int INF = INT_MAX/2;
+
+using namespace std;
 
 GrafoListaAdj::GrafoListaAdj()
 {
@@ -89,6 +90,15 @@ void GrafoListaAdj::removeArestaDirecionada(int id_vertice_entrada, int id_verti
             it->removeAresta(id_vertice_entrada);
             break;
         }
+    }
+}
+
+Vertice GrafoListaAdj::getVertice(int id_vertice) {
+    list <Vertice>::iterator it;
+
+    for(it = this->vertices.begin(); it != this->vertices.end(); ++it) {
+        if(it->getID() == id_vertice)
+            return *it;
     }
 }
 
@@ -351,6 +361,7 @@ bool GrafoListaAdj::isMultigrafo() {
 }
 */
 
+//constroi a matriz de caminhos mpinimos do grafo através do algoritmo de Floyd
 int** GrafoListaAdj::geraMatrizesFloyd() {
     int n = getOrdem();
     int** distancias = (int **) malloc(sizeof(int *) * n);
@@ -376,7 +387,57 @@ int** GrafoListaAdj::geraMatrizesFloyd() {
     return distancias;
 }
 
+//executa o algoritmo de floyd e consulta o valor do caminho minimo gerado
 int GrafoListaAdj::caminhoMinimoFloyd(int id_origem, int id_destino) {
     int** distancias = geraMatrizesFloyd();
     return distancias[id_origem-1][id_destino-1];
+}
+
+//preenche o vetor dos vertices visitados de acordo com o grau da profundidade
+void GrafoListaAdj::auxBuscaProfundidade(int* visitados, int vertice_inicial, int cont) {
+    Vertice v = this->getVertice(vertice_inicial);
+    visitados[vertice_inicial - 1] = cont;
+    for(Aresta* a = v.getListaArestas(); a != NULL; a = a->getProx()){
+        if(!visitados[a->getIdVertice() - 1] || visitados[a->getIdVertice() - 1] > cont)
+            auxBuscaProfundidade(visitados, a->getIdVertice(), cont+1);
+    }
+}
+
+//inicializa o vetor dos vertices visitados com o valor zero e chama método auxiliar
+int* GrafoListaAdj::buscaProfundidade(int vertice_inicial) {
+    int cont = 1, n = getOrdem();
+    int* visitados = (int *) malloc(sizeof(int) * n);
+    for(int i = 0; i < n; i++)
+        visitados[i] = 0;
+    auxBuscaProfundidade(visitados, vertice_inicial, cont);
+    return visitados;
+}
+
+//retorna lista contendo os ids ds vertices que compoem o fecho transitivo direto do vertice
+list<int> GrafoListaAdj::fechoTransitivoDireto(int id_vertice) {
+    list<int> ftd;
+    int* buscaProfundidade = this->buscaProfundidade(id_vertice);
+    int i = 0;
+    while(i < this->getOrdem()) {
+        if(!buscaProfundidade[i])
+            i++;
+        else {
+            ftd.push_back(i+1);
+            i++;
+        }
+    }
+    return ftd;
+}
+
+//retorna lista contendo os ids ds vertices que compoem o fecho transitivo indireto do vertice
+list<int> GrafoListaAdj::fechoTransitivoIndireto(int id_vertice) {
+    list<int> fti;
+    list <Vertice>::iterator it;
+    for(it = vertices.begin(); it != vertices.end(); ++it){
+        int vertice_id = it->getID();
+        int* busca = this->buscaProfundidade(vertice_id);
+        if(busca[id_vertice - 1])
+            fti.push_back(vertice_id);
+    }
+    return fti;
 }

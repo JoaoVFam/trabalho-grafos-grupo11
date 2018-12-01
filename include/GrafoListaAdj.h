@@ -21,6 +21,7 @@ private:
     bool nulo = false;
 
     int** geraMatrizesFloyd();
+    void auxBuscaProfundidade(int* visitados, int vertice_inicial, int cont);
 
 
 public:
@@ -36,6 +37,9 @@ public:
 
     void adicionaArestaDirecionada(int id_vertice_saida, int id_vertice_entrada);
     void removeArestaDirecionada(int id_vertice_saida, int id_vertice_entrada);
+
+    Vertice getVertice(int id_vertice);
+    Aresta getAresta(int id_vertice_1, int id_vertice_2);
 
     int getGrau(int id_vertice); // retorna o grau de um vertice
     int getGrauSaida(int id_vertice);
@@ -66,6 +70,10 @@ public:
     bool isBipartido();
 
     int caminhoMinimoFloyd(int id_origem, int id_destino);
+    int* buscaProfundidade(int vertice_inicial);
+
+    list<int> fechoTransitivoDireto(int id_vertice);
+    list<int> fechoTransitivoIndireto(int id_vertice);
 
 };
 

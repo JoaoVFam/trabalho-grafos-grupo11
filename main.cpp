@@ -75,8 +75,16 @@ int main()
     }
 
     grafo.mostrarVizinhancaFechada(2);
-    cout <<"peso: " << grafo.getPesoAresta(5, 1) << endl;
-    cout << "Floyd " << grafo.caminhoMinimoFloyd(1, 2);
+    cout <<"peso: " << grafo.getPesoAresta(1, 2) << endl;
+    cout << "Floyd " << grafo.caminhoMinimoFloyd(1, 2) << endl;
+    cout << "BuscaProfundidade: ";
+    list<int> vet = grafo.fechoTransitivoDireto(6);
+    list<int>::iterator it;
+    for(it = vet.begin(); it != vet.end(); ++it) {
+        cout << *it << " ";
+    }
+    cout << endl;
+
 
     return 0;
 }
