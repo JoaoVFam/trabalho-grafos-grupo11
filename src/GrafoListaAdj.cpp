@@ -441,3 +441,30 @@ list<int> GrafoListaAdj::fechoTransitivoIndireto(int id_vertice) {
     }
     return fti;
 }
+
+list<int> GrafoListaAdj::ordenacaoTopologica() {
+    list<int> ordenacaoTopologica;
+    int n = getOrdem();
+    int* grausEntrada = (int *) malloc(sizeof(int) * n);
+    for(int i = 0; i < n; i++){
+        grausEntrada[i] = this->getGrauEntrada(i+1);
+    }
+
+    int cont = 0;
+    while(cont < n) {
+        for(int i = 0; i < n; i++){
+            if(grausEntrada[i] == 0){
+                grausEntrada[i] = -1; //simboliza que o vertice já foi adicionado na lista
+                ordenacaoTopologica.push_back(i+1);
+                Aresta* a = this->getVertice(i+1).getListaArestas();
+                while(a != NULL) {
+                    grausEntrada[a->getIdVertice() - 1]--; //remove o vertice adicionado da lista e diminui o grau de entrada dos outrosx
+                    a = a->getProx();
+                }
+                cont++;
+                break;
+            }
+        }
+    }
+    return ordenacaoTopologica;
+}

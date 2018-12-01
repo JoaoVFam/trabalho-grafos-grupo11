@@ -41,7 +41,7 @@ void gerarGrafoPorArquivo(std::string nome_arquivo ,GrafoListaAdj* grafo) // ace
         grafo->adicionarVertice(i); // � adicionado um vertice no grafo com o id = i
     }
     while(inFile >> vertice_1 && inFile >> vertice_2 && inFile >> peso){ //enquanto encontrar os pares de valores no arquivo, � adicionada uma aresta ao grafo
-        grafo->adicionarAresta(vertice_1, vertice_2);
+        grafo->adicionaArestaDirecionada(vertice_1, vertice_2);
         grafo->adicionaPesoAresta(vertice_1, vertice_2, peso);
     }
 
@@ -78,7 +78,7 @@ int main()
     cout <<"peso: " << grafo.getPesoAresta(1, 2) << endl;
     cout << "Floyd " << grafo.caminhoMinimoFloyd(1, 2) << endl;
     cout << "BuscaProfundidade: ";
-    list<int> vet = grafo.fechoTransitivoDireto(6);
+    list<int> vet = grafo.ordenacaoTopologica();
     list<int>::iterator it;
     for(it = vet.begin(); it != vet.end(); ++it) {
         cout << *it << " ";
