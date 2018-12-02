@@ -59,8 +59,13 @@ void Aresta::setPeso(int peso)
 {
     this->peso = peso;
 }
-void Aresta::getIdSec(int id)
+void Aresta::setIdSec(int id)
 {
 
      this->id_sec=id;
+}
+int Aresta::getIdSec() {
+
+
+    return this->id_sec;
 }

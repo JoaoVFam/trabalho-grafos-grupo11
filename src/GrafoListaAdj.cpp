@@ -110,14 +110,16 @@ int GrafoListaAdj::getGrauSaida(int id_vertice) {
 int GrafoListaAdj::getGrauEntrada(int id_vertice) {
     int grauEntrada = 0;
     list <Vertice>::iterator it;
+    list<Aresta>::iterator it2;
     for(it = this->vertices.begin(); it != this->vertices.end(); ++it) {
-        Aresta* aresta = it->getListaArestas();
-        while(aresta != NULL) {
-            if(aresta->getIdVertice() == id_vertice) {
+       for(it2=it->ListaAresta.begin();it2 !=it->ListaAresta.end();it2++)
+       {
+
+            if(it2->getIdVertice() == id_vertice) {
                 grauEntrada++;
                 break;
             }
-            aresta = aresta->getProx();
+
         }
     }
     return grauEntrada;
@@ -219,8 +221,8 @@ void GrafoListaAdj::defineCor(Vertice v){
     list <Vertice>::iterator it1;
     list<Aresta>::iterator it2;
     for(it1 = this->vertices.begin(); it1 != this->vertices.end(); ++it1){
-        for(it2 = v->listaAresta.begin(); it2 != v->listaAresta.end(); ++it2){
-            v->listaAresta.i->getCor();
+        for(it2 =v.ListaAresta.begin(); it2 != v.ListaAresta.end(); ++it2){
+          //  it2->getCor();
 
         }
     }
@@ -229,20 +231,21 @@ void GrafoListaAdj::defineCor(Vertice v){
 int GrafoListaAdj::getPesoAresta(int id_vertice_1, int id_vertice_2)
 {
     list<Vertice>::iterator it;
+    list<Aresta>::iterator it2;
     int peso_aresta_1, peso_aresta_2; // irá armazenar o peso salvo nas arestas dentro de cada vertice
     for(it = vertices.begin(); it != vertices.end(); ++it) {
         if(it->getID() == id_vertice_1) {
-            for(Aresta* a = it->getListaArestas(); a != NULL; a = a->getProx()) {
-                if(a->getIdVertice() == id_vertice_2) {
-                    peso_aresta_1 = a->getPeso();
+            for(it2= it->ListaAresta.begin(); it2!=it->ListaAresta.end(); it2++) {
+                if(it2->getIdVertice() == id_vertice_2) {
+                    peso_aresta_1 = it2->getPeso();
                     break;
                 }
             }
         }
         if(it->getID() == id_vertice_2) {
-            for(Aresta* a = it->getListaArestas(); a != NULL; a = a->getProx()) {
-                if(a->getIdVertice() == id_vertice_1) {
-                    peso_aresta_2 = a->getPeso();
+            for(it2 = it->ListaAresta.begin();it2!=it->ListaAresta.end(); it2++) {
+                if(it2->getIdVertice() == id_vertice_1) {
+                    peso_aresta_2 = it2->getPeso();
                     break;
                 }
             }
@@ -260,19 +263,20 @@ int GrafoListaAdj::getPesoAresta(int id_vertice_1, int id_vertice_2)
 
 void GrafoListaAdj::adicionaPesoAresta(int id_vertice_1, int id_vertice_2, int peso) {
     list<Vertice>::iterator it;
+    list<Aresta>::iterator it2;
     for(it = vertices.begin(); it != vertices.end(); ++it) {
         if(it->getID() == id_vertice_1) {
-            for(Aresta* a = it->getListaArestas(); a != NULL; a = a->getProx()) {
-                if(a->getIdVertice() == id_vertice_2) {
-                    a->setPeso(peso);
+            for(it2 = it->ListaAresta.begin(); it2 != it->ListaAresta.end();it2++) {
+                if(it2->getIdVertice() == id_vertice_2) {
+                    it2->setPeso(peso);
                     break;
                 }
             }
         }
         if(it->getID() == id_vertice_2) {
-            for(Aresta* a = it->getListaArestas(); a != NULL; a = a->getProx()) {
-                if(a->getIdVertice() == id_vertice_1) {
-                    a->setPeso(peso);
+            for(it2 = it->ListaAresta.begin(); it2 != it->ListaAresta.end();it2++) {
+                if(it2->getIdVertice() == id_vertice_1) {
+                    it2->setPeso(peso);
                     break;
                 }
             }
@@ -328,20 +332,20 @@ GrafoListaAdj GrafoListaAdj::algoritmoKruskal()
         int i;
         int no1,no2;
         bool n1,n2;
-        Vertice *aux;
+        Vertice aux;
         list<Aresta>Candidatas = this->ArestasGrafo;
-        Candidatas.sort([](Aresta *aresta1, Aresta *aresta2) {
-        return aresta1->getPeso() < aresta2->getPeso();
-    });
+        Candidatas.sort([](Aresta aresta1, Aresta aresta2) {
+          return aresta1.getPeso() < aresta2.getPeso();
+         });
         list <Aresta>::iterator it;
         list<Vertice>::iterator it2;
         for(i=0;i<qtd;i++)
         {
-            no1 = Candidatas.begin()->getIdVertice();
-            no2 = Candidatas.begin()->getIdSec();
-            n1= (std::find(solucaov.begin(), solucaov.end(), no1) != solucaov.end());
-            n2= (std::find(solucaov.begin(), solucaov.end(), no2) != solucaov.end());
 
+            no1= Candidatas.begin()->getIdVertice();
+            no2= Candidatas.begin()->getIdSec();
+            n1=  contemvertice(solucaov,no1);
+            n2= contemvertice(solucaov,no2);
             if(!n1 && !n2)
             {
                 solucaov.push_back(achavertice(no2));
@@ -362,7 +366,7 @@ GrafoListaAdj GrafoListaAdj::algoritmoKruskal()
                 for(it = it2->ListaAresta.begin();it != it2->ListaAresta.end(); ++it)
                 {
 
-                    teste= (std::find(solucaov.begin(), solucaov.end(), it2) != solucaov.end());
+                   teste= contemvertice(solucaov,it2->getID());
                     if(teste) verifica++;
 
                 }
@@ -392,7 +396,7 @@ GrafoListaAdj GrafoListaAdj::algoritmoKruskal()
                 for(it = it2->ListaAresta.begin();it != it2->ListaAresta.end(); ++it)
                 {
 
-                    teste= (std::find(solucaov.begin(), solucaov.end(), it2) != solucaov.end());
+                  //  teste= (std::find(solucaov.begin(), solucaov.end(), it2) != solucaov.end());
                     if(teste==true) verifica++;
 
                 }
@@ -432,9 +436,9 @@ GrafoListaAdj GrafoListaAdj::algoritmoPrim(Vertice v)
          {
               ita->setIdSec(ita->getIdVertice());
          }
-         Candidatas.sort([](Aresta *aresta1, Aresta *aresta2) {
-             return aresta1->getPeso() < aresta2->getPeso();
-         });
+         Candidatas.sort([](Aresta aresta1, Aresta aresta2) {
+            return aresta1.getPeso() < aresta2.getPeso();
+        });
          for(it= Solut.begin();it!=Solut.end();it++)
          {
              if(Candidatas.begin()->getIdVertice()==it->getID())
@@ -505,7 +509,7 @@ void GrafoListaAdj::DFS() {
 
     int tam,i;
     tam = this->vertices.size();
-    bool visitados = new bool [tam];
+    bool visitados [tam];
     for(i=0;i<tam;i++)
     {
         visitados[i]= false;
@@ -514,7 +518,7 @@ void GrafoListaAdj::DFS() {
     {
         if(visitados[i]==false)
         {
-            DFSAux(i,visitados[]);
+            DFSAux(i,visitados);
         }
     }
 
@@ -577,4 +581,15 @@ Vertice GrafoListaAdj::achavertice(int id)
 
 
 }
-
+bool GrafoListaAdj::contemvertice(list<Vertice>S,int idno)
+{
+    list <Vertice>::iterator it;
+    for(it=S.begin();it!=S.end();it++)
+    {
+        if(it->getID()==idno)
+        {
+            return true;
+        }
+    }
+    return false;
+}

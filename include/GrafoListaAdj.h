@@ -70,6 +70,7 @@ public:
     void DFS();
     bool isBipartido();
     void sequenciaGrau();
+    bool contemvertice(list<Vertice>S,int idno);
 
 };
 

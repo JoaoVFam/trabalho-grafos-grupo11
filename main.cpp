@@ -12,6 +12,7 @@
 
 using namespace std;
 
+
 void gerarGrafoPorArquivo(std::string nome_arquivo ,GrafoListaAdj* grafo) // aceita como par�metro o nome do arquivo na pasta e o grafo que se deseja popular
 {
     string caminhoArquivo = "instancias_grafos/" + nome_arquivo + ".txt";
