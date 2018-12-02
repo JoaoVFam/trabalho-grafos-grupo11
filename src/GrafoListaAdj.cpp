@@ -479,6 +479,8 @@ GrafoListaAdj GrafoListaAdj::algoritmoPrim(Vertice v)
      return Primsolut;
 
 }
+
+
 void GrafoListaAdj::algoritimoDjsktra(Vertice c)
 {
     list<Vertice> S = this->vertices;
@@ -622,7 +624,7 @@ list<int> GrafoListaAdj::fechoTransitivoIndireto(int id_vertice) {
 
 list<int> GrafoListaAdj::ordenacaoTopologica() {
     list<int> ordenacaoTopologica;
-    list<Aresta>::iterator it;
+    list <Aresta>::iterator it;
     int n = getOrdem();
     int* grausEntrada = (int *) malloc(sizeof(int) * n);
     for(int i = 0; i < n; i++){
@@ -635,8 +637,8 @@ list<int> GrafoListaAdj::ordenacaoTopologica() {
             if(grausEntrada[i] == 0){
                 grausEntrada[i] = -1; //simboliza que o vertice já foi adicionado na lista
                 ordenacaoTopologica.push_back(i+1);
-                for(it=this->getVertice(i+1).ListaAresta.begin();it!=this->getVertice(i+1).ListaAresta.end();it++)
-                {
+                list<Aresta> listaAresta = this->getVertice(i+1).ListaAresta;
+                for(it = listaAresta.begin();it != listaAresta.end(); ++it) {
                     grausEntrada[it->getIdVertice() - 1]--; //remove o vertice adicionado da lista e diminui o grau de entrada dos outrosx
                 }
                 cont++;
