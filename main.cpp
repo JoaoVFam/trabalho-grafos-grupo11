@@ -5,7 +5,7 @@
 
 /*
 *
-*@Author Jo�o Victor Lopes Fam
+*@Author grupo11
 *
 *
 */
@@ -18,7 +18,7 @@ void gerarGrafoPorArquivo(std::string nome_arquivo ,GrafoListaAdj* grafo) // ace
     string caminhoArquivo = "instancias_grafos/" + nome_arquivo + ".txt";
     ifstream inFile(caminhoArquivo.c_str());
     int numero_vertices;
-    int vertice_1, vertice_2;
+    int vertice_1, vertice_2, peso;
     //inFile.open(caminhoArquivo); // abre o arquivo
 
     //instancias_grafos/grafo_1000_1
@@ -41,8 +41,9 @@ void gerarGrafoPorArquivo(std::string nome_arquivo ,GrafoListaAdj* grafo) // ace
     for(int i=1; i<=numero_vertices; i++){ //itera sobre o n�mero de vertices para adicionar os vertices no grafo
         grafo->adicionarVertice(i); // � adicionado um vertice no grafo com o id = i
     }
-    while(inFile >> vertice_1 && inFile >> vertice_2){ //enquanto encontrar os pares de valores no arquivo, � adicionada uma aresta ao grafo
-        grafo->adicionarAresta(vertice_1, vertice_2);
+    while(inFile >> vertice_1 && inFile >> vertice_2 && inFile >> peso){ //enquanto encontrar os pares de valores no arquivo, � adicionada uma aresta ao grafo
+        grafo->adicionaArestaDirecionada(vertice_1, vertice_2);
+        grafo->adicionaPesoAresta(vertice_1, vertice_2, peso);
     }
 
     inFile.close(); // fechando leitor
@@ -59,7 +60,6 @@ int main()
     GrafoListaAdj grafo;
     gerarGrafoPorArquivo(nomeArquivo, &grafo); // popula o grafo atrav�s do arquivo
     int num_vertices = grafo.getOrdem();
-    grafo.removerAresta(1, 2);
 
 
     cout << "N�mero de vertices: " << num_vertices << endl;
@@ -76,9 +76,16 @@ int main()
     }
 
     grafo.mostrarVizinhancaFechada(2);
+    cout <<"peso: " << grafo.getPesoAresta(1, 2) << endl;
+    cout << "Floyd " << grafo.caminhoMinimoFloyd(1, 2) << endl;
+    cout << "BuscaProfundidade: ";
+    list<int> vet = grafo.ordenacaoTopologica();
+    list<int>::iterator it;
+    for(it = vet.begin(); it != vet.end(); ++it) {
+        cout << *it << " ";
+    }
+    cout << endl;
 
-    grafo.adicionaPesoAresta(3, 4, 101);
-    cout << grafo.getPesoAresta(1, 4);
 
     return 0;
 }

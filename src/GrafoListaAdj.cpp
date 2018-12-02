@@ -1,7 +1,17 @@
 #include "GrafoListaAdj.h"
 #include <list>
+
 #include <algorithm>
 #include "limits.h"
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <values.h>
+
+const int INF = INT_MAX/2;
+
+using namespace std;
+
 
 GrafoListaAdj::GrafoListaAdj()
 {
@@ -86,6 +96,15 @@ void GrafoListaAdj::removeArestaDirecionada(int id_vertice_entrada, int id_verti
             it->removeAresta(id_vertice_entrada);
             break;
         }
+    }
+}
+
+Vertice GrafoListaAdj::getVertice(int id_vertice) {
+    list <Vertice>::iterator it;
+
+    for(it = this->vertices.begin(); it != this->vertices.end(); ++it) {
+        if(it->getID() == id_vertice)
+            return *it;
     }
 }
 
@@ -194,15 +213,15 @@ void GrafoListaAdj::imprimeSequenciaGraus() {
 
     int k = 0;
     for(it = this->vertices.begin(); it!=this->vertices.end(); ++it) {
-        graus[k] = it->getGrau();
+        graus[k] = (int) it->getGrau();
+        k++;
     }
 
     //ordena��o do vetor em ordem decrescente
-    int aux;
     for(int i = 0; i<numVertices; i++) {
         for(int j = i+1; j<numVertices; j++) {
             if(graus[i] < graus[j]) {
-                aux = graus[i];
+                int aux = graus[i];
                 graus[i] = graus[j];
                 graus[j] = aux;
             }
@@ -216,23 +235,13 @@ void GrafoListaAdj::imprimeSequenciaGraus() {
     cout << endl;
 }
 
-// TODO: acertar bug que está ocorrendo nesta função abaixo que foi comentada
-void GrafoListaAdj::defineCor(Vertice v){
-    list <Vertice>::iterator it1;
-    list<Aresta>::iterator it2;
-    for(it1 = this->vertices.begin(); it1 != this->vertices.end(); ++it1){
-        for(it2 =v.ListaAresta.begin(); it2 != v.ListaAresta.end(); ++it2){
-          //  it2->getCor();
 
-        }
-    }
-}
 
 int GrafoListaAdj::getPesoAresta(int id_vertice_1, int id_vertice_2)
 {
     list<Vertice>::iterator it;
     list<Aresta>::iterator it2;
-    int peso_aresta_1, peso_aresta_2; // irá armazenar o peso salvo nas arestas dentro de cada vertice
+    int peso_aresta_1 = 1, peso_aresta_2 = 2; // irá armazenar o peso salvo nas arestas dentro de cada vertice
     for(it = vertices.begin(); it != vertices.end(); ++it) {
         if(it->getID() == id_vertice_1) {
             for(it2= it->ListaAresta.begin(); it2!=it->ListaAresta.end(); it2++) {
@@ -253,11 +262,10 @@ int GrafoListaAdj::getPesoAresta(int id_vertice_1, int id_vertice_2)
 
     }
     if(peso_aresta_1 == peso_aresta_2) {
-        cout << "getPesoAresta funcionou!" << endl;
         return peso_aresta_1;
     } else {
-        cout << "getPesoAresta pesos das arestas nao batem (talvez sejam direcionadas ou nao existe aresta): return 0" << endl;
-        return 0;
+        //retorna o maior valor inteiro possível para representar a ausencia de aresta
+        return INF;
     }
 }
 
@@ -326,59 +334,59 @@ bool GrafoListaAdj::isBipartido()
 GrafoListaAdj GrafoListaAdj::algoritmoKruskal()
 {
 
-        GrafoListaAdj arvore;
-        list<Vertice> solucaov;
-        int qtd = this->vertices.size()-1;
+        GrafoListaAdj arvore;                  //arvore com a solução
+        list<Vertice> solucaov;                // vertices da solução pra  verificar ciclo
+        int qtd = this->vertices.size()-1;     // quantidades de iteração do algoritimo n-1 sendo n numero de vertices
         int i;
-        int no1,no2;
+        int no1,no2;                           // variaveis auxiliares;
         bool n1,n2;
         Vertice aux;
-        list<Aresta>Candidatas = this->ArestasGrafo;
-        Candidatas.sort([](Aresta aresta1, Aresta aresta2) {
+        list<Aresta>Candidatas = this->ArestasGrafo;   // lista com as candidatas a solução
+        Candidatas.sort([](Aresta aresta1, Aresta aresta2) {  // ordena lista de candidatas por peso
           return aresta1.getPeso() < aresta2.getPeso();
          });
         list <Aresta>::iterator it;
         list<Vertice>::iterator it2;
-        for(i=0;i<qtd;i++)
+        for(i=0;i<qtd;i++)                                  // loop de iterações
         {
 
-            no1= Candidatas.begin()->getIdVertice();
+            no1= Candidatas.begin()->getIdVertice();    // pega id dos vertices pra verificar a solução
             no2= Candidatas.begin()->getIdSec();
             n1=  contemvertice(solucaov,no1);
-            n2= contemvertice(solucaov,no2);
-            if(!n1 && !n2)
+            n2= contemvertice(solucaov,no2);             // verifica se algum dos nós da aresta está na solução
+            if(!n1 && !n2)                               // nenhum dos dois está
             {
-                solucaov.push_back(achavertice(no2));
+                solucaov.push_back(achavertice(no2));                 // adiciona os vertices na solução
                 solucaov.push_back(achavertice(no1));
-                arvore.ArestasGrafo.push_back(Candidatas.front());
-                Candidatas.pop_front();
+                arvore.ArestasGrafo.push_back(Candidatas.front());      // adiciona aresta na arvore de solução
+                Candidatas.pop_front();    // retira a aresta utilizada da lista de candidatas
 
             }
-            if(n1 && !n2)
+            if(n1 && !n2)             // caso um esteja
             {
                 int verifica = 0;
-                it2=vertices.begin();
+                it2=vertices.begin();                            // verifica a outra ponta da aresta
                 bool teste;
-                while(it2->getID()!= no2)
+                while(it2->getID()!= no2)            // pega o vertice com id da outra ponta
                 {
                     it2++;
                 }
                 for(it = it2->ListaAresta.begin();it != it2->ListaAresta.end(); ++it)
                 {
 
-                   teste= contemvertice(solucaov,it2->getID());
+                   teste= contemvertice(solucaov,it2->getID());                   // verifica se alguma das adjacencia dele aponta pra um nó da solução caso tenha significa que fecha ciclo
                     if(teste) verifica++;
 
                 }
-                if(verifica==0)
+                if(verifica==0)                                             // caso a estrutura ainda esteja zerada não fecha ciclo
                 {
-                    arvore.ArestasGrafo.push_back(Candidatas.front());
-                    Candidatas.pop_front();
+                    arvore.ArestasGrafo.push_back(Candidatas.front());      // aresta adicionada a solução
+                    Candidatas.pop_front();                                     // vertice adcionado a solução
                     solucaov.push_back(achavertice(no2));
 
                 }else
                 {
-                    Candidatas.pop_front();
+                    Candidatas.pop_front();         // caso feche ciclo só descarta a aresta
                 }
 
 
@@ -389,14 +397,14 @@ GrafoListaAdj GrafoListaAdj::algoritmoKruskal()
                 int verifica = 0;
                 it2=vertices.begin();
                 bool teste;
-                while(it2->getID()!= n1)
+                while(it2->getID()!= n1)                             // faz o mesmo procedimento só que com outro vertice da aresta
                 {
                     it2++;
                 }
                 for(it = it2->ListaAresta.begin();it != it2->ListaAresta.end(); ++it)
                 {
 
-                  //  teste= (std::find(solucaov.begin(), solucaov.end(), it2) != solucaov.end());
+                    teste= contemvertice(solucaov,it2->getID());
                     if(teste==true) verifica++;
 
                 }
@@ -411,6 +419,7 @@ GrafoListaAdj GrafoListaAdj::algoritmoKruskal()
                 }
             }
         }
+        return arvore;
 
 }
 
@@ -431,43 +440,43 @@ GrafoListaAdj GrafoListaAdj::algoritmoPrim(Vertice v)
 
      while(Solut.size()<tam) // loop pra cobrir todos os vertices
      {
-         int controle =0;
+         int controle =0;                     // variavel pra verificar se fecha ciclo
          for(ita=vc->ListaAresta.begin();ita!=vc->ListaAresta.end();ita++)
          {
-              ita->setIdSec(ita->getIdVertice());
+              ita->setIdSec(ita->getIdVertice());                       // marca a aresta com o vertice atual usando a estrutura secundaria idsec pra quando estiver na estrutra sabermos a origem da aresta
          }
          Candidatas.sort([](Aresta aresta1, Aresta aresta2) {
-            return aresta1.getPeso() < aresta2.getPeso();
+            return aresta1.getPeso() < aresta2.getPeso();             // ordena as arestas candidatas
         });
-         for(it= Solut.begin();it!=Solut.end();it++)
+         for(it= Solut.begin();it!=Solut.end();it++)                             // pega menor entre as candidatas
          {
-             if(Candidatas.begin()->getIdVertice()==it->getID())
+             if(Candidatas.begin()->getIdVertice()==it->getID())     // verifica se fecha ciclo
              {
                  controle++;
              }
 
          }
-         if(controle!=0)
+         if(controle!=0)          // caso feche desconsidera a aresta
          {
              Candidatas.pop_front();
          }else {
 
 
-             Primsolut.adicionarVertice(Candidatas.front().getIdVertice());
+             Primsolut.adicionarVertice(Candidatas.front().getIdVertice());               // caso não feche adiciona a aresta e os vertices na solução
              Primsolut.adicionarVertice(Candidatas.front().getIdSec());
              Primsolut.adicionarAresta(Candidatas.front().getIdSec(),Candidatas.front().getIdVertice());
              Solut.push_back(v);
              idno = Candidatas.front().getIdVertice();
              it = this->vertices.begin();
-             while (it->getID() != idno) {
+             while (it->getID() != idno) {          // aponta pro proximo vertice pra fazer o mesmo prcedimento
                  it++;
              }
              vc = &*it;
-             Candidatas.pop_front();
+             Candidatas.pop_front();     // remove a aresta que já esta na solução da lista de candidatas
 
          }
      }
-
+     return Primsolut;
 
 }
 void GrafoListaAdj::algoritimoDjsktra(Vertice c)
@@ -475,21 +484,21 @@ void GrafoListaAdj::algoritimoDjsktra(Vertice c)
     list<Vertice> S = this->vertices;
     int i;
     int tam = this->vertices.size();
-    int distancia[tam];
-    bool visitado[tam];
-    for(i=0;i<tam;i++)
+    int distancia[tam];  // vetor par armazenar a distancia da origem ao vertice
+    bool visitado[tam];  // pra saber se o vertice já foi visitado ou não
+    for(i=0;i<tam;i++)    // inicializa o vetor de distancia com o maior valor possivel e o de visitado com false
     {
         visitado[i]=false;
         distancia[i]= INT_MAX;
     }
-    distancia[c.getID()]=0;
-    while (!S.empty())
+    distancia[c.getID()]=0;  // distancia a origem e inicializada com zero
+    while (!S.empty())        // enquanto a lista não for esvaziada
     {
-        if(visitado[S.front().getID()]==false)
+        if(visitado[S.front().getID()]==false)   //vê se o vertice atual foi visitado
         {
-            visitado[S.front().getID()]= true;
+            visitado[S.front().getID()]= true;  // caso não seja marca como true
             list<Aresta>::iterator it;
-            for(it=S.front().ListaAresta.begin();it!=S.front().ListaAresta.end();it++)
+            for(it=S.front().ListaAresta.begin();it!=S.front().ListaAresta.end();it++)      // verifica as distancias e se dele até os vertices adjacentes for mais curta que a distancia atual atualiza a distancia
             {
                 if(it->getPeso()+distancia[S.front().getID()]<distancia[it->getIdVertice()])
                 {
@@ -498,47 +507,14 @@ void GrafoListaAdj::algoritimoDjsktra(Vertice c)
 
             }
         }
-        S.pop_front();
+        S.pop_front();  // retira o vertice da lista
 
     }
 
 
 
 }
-void GrafoListaAdj::DFS() {
 
-    int tam,i;
-    tam = this->vertices.size();
-    bool visitados [tam];
-    for(i=0;i<tam;i++)
-    {
-        visitados[i]= false;
-    }
-    for(i=0;i<tam;i++)
-    {
-        if(visitados[i]==false)
-        {
-            DFSAux(i,visitados);
-        }
-    }
-
-}
-
-void GrafoListaAdj::DFSAux(int i, bool *visitado) {
-
-    visitado[i] = true;
-
-    list<Vertice>::iterator it = this->vertices.begin();
-    advance(it, i);
-    list<Aresta>::iterator it2;
-    for (it2 = it->ListaAresta.begin(); it2 != it->ListaAresta.end(); it2++) {
-
-        if (!visitado[it->getID()] == false) {
-            DFSAux(it2->getIdVertice(), visitado);
-        }
-
-    }
-}
 
 void GrafoListaAdj::setNulo() {
     nulo = true;
@@ -562,13 +538,113 @@ bool GrafoListaAdj::isMultigrafo() {
 }
 */
 
-void GrafoListaAdj::sequenciaGrau() {
-    list <Vertice>::iterator it;
-    cout<<endl<<"[";
-    for(it = this->vertices.begin(); it != this->vertices.end(); ++it){
-        cout << it->getGrau()<< ", " ;
+//constroi a matriz de caminhos mpinimos do grafo através do algoritmo de Floyd
+int** GrafoListaAdj::geraMatrizesFloyd() {
+    int n = getOrdem();
+    int** distancias = (int **) malloc(sizeof(int *) * n);
+    for(int i=0; i < n; i++){
+        distancias[i] = (int *) malloc(sizeof(int) * n);
     }
-    cout<<"]" <<endl;
+
+    for(int i = 0; i<n; i++){
+        for(int j = 0; j<n; j++){
+            if(i==j)
+                distancias[i][j] = 0;
+            else
+                distancias[i][j] = this->getPesoAresta(i+1, j+1);
+        }
+    }
+
+    for(int aux = 0; aux < n; aux++)
+        for(int i = 0; i < n; i++)
+            for(int j = 0; j<n; j++)
+                if(distancias[i][j] > distancias[i][aux] + distancias[aux][j])
+                    distancias[i][j] = distancias[i][aux] + distancias[aux][j];
+
+    return distancias;
+}
+
+//executa o algoritmo de floyd e consulta o valor do caminho minimo gerado
+int GrafoListaAdj::caminhoMinimoFloyd(int id_origem, int id_destino) {
+    int** distancias = geraMatrizesFloyd();
+    return distancias[id_origem-1][id_destino-1];
+}
+
+//preenche o vetor dos vertices visitados de acordo com o grau da profundidade
+void GrafoListaAdj::auxBuscaProfundidade(int* visitados, int vertice_inicial, int cont) {
+    list<Aresta>::iterator it;
+    Vertice v = this->getVertice(vertice_inicial);
+    visitados[vertice_inicial - 1] = cont;
+    for(it = v.ListaAresta.begin(); it != v.ListaAresta.end();it++){
+        if(!visitados[it->getIdVertice() - 1] || visitados[it->getIdVertice() - 1] > cont)
+            auxBuscaProfundidade(visitados, it->getIdVertice(), cont+1);
+    }
+}
+
+//inicializa o vetor dos vertices visitados com o valor zero e chama método auxiliar
+int* GrafoListaAdj::buscaProfundidade(int vertice_inicial) {
+    int cont = 1, n = getOrdem();
+    int* visitados = (int *) malloc(sizeof(int) * n);
+    for(int i = 0; i < n; i++)
+        visitados[i] = 0;
+    auxBuscaProfundidade(visitados, vertice_inicial, cont);
+    return visitados;
+}
+
+//retorna lista contendo os ids ds vertices que compoem o fecho transitivo direto do vertice
+list<int> GrafoListaAdj::fechoTransitivoDireto(int id_vertice) {
+    list<int> ftd;
+    int* buscaProfundidade = this->buscaProfundidade(id_vertice);
+    int i = 0;
+    while(i < this->getOrdem()) {
+        if(!buscaProfundidade[i])
+            i++;
+        else {
+            ftd.push_back(i+1);
+            i++;
+        }
+    }
+    return ftd;
+}
+
+//retorna lista contendo os ids ds vertices que compoem o fecho transitivo indireto do vertice
+list<int> GrafoListaAdj::fechoTransitivoIndireto(int id_vertice) {
+    list<int> fti;
+    list <Vertice>::iterator it;
+    for(it = vertices.begin(); it != vertices.end(); ++it){
+        int vertice_id = it->getID();
+        int* busca = this->buscaProfundidade(vertice_id);
+        if(busca[id_vertice - 1])
+            fti.push_back(vertice_id);
+    }
+    return fti;
+}
+
+list<int> GrafoListaAdj::ordenacaoTopologica() {
+    list<int> ordenacaoTopologica;
+    list<Aresta>::iterator it;
+    int n = getOrdem();
+    int* grausEntrada = (int *) malloc(sizeof(int) * n);
+    for(int i = 0; i < n; i++){
+        grausEntrada[i] = this->getGrauEntrada(i+1);
+    }
+
+    int cont = 0;
+    while(cont < n) {
+        for(int i = 0; i < n; i++){
+            if(grausEntrada[i] == 0){
+                grausEntrada[i] = -1; //simboliza que o vertice já foi adicionado na lista
+                ordenacaoTopologica.push_back(i+1);
+                for(it=this->getVertice(i+1).ListaAresta.begin();it!=this->getVertice(i+1).ListaAresta.end();it++)
+                {
+                    grausEntrada[it->getIdVertice() - 1]--; //remove o vertice adicionado da lista e diminui o grau de entrada dos outrosx
+                }
+                cont++;
+                break;
+            }
+        }
+    }
+    return ordenacaoTopologica;
 }
 Vertice GrafoListaAdj::achavertice(int id)
 {

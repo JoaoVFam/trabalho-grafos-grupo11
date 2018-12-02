@@ -8,8 +8,7 @@
 using namespace std;
 /*
 *
-*@Author Jo�o Victor Lopes Fam
-*
+*@Author grupo11
 *
 */
 
@@ -21,6 +20,9 @@ private:
     int k; //Quantidade de cores
     bool trivial;
     bool nulo = false;
+
+    int** geraMatrizesFloyd();
+    void auxBuscaProfundidade(int* visitados, int vertice_inicial, int cont);
 
 
 public:
@@ -36,6 +38,9 @@ public:
 
     void adicionaArestaDirecionada(int id_vertice_saida, int id_vertice_entrada);
     void removeArestaDirecionada(int id_vertice_saida, int id_vertice_entrada);
+
+    Vertice getVertice(int id_vertice);
+    Aresta getAresta(int id_vertice_1, int id_vertice_2);
 
     int getGrau(int id_vertice); // retorna o grau de um vertice
     int getGrauSaida(int id_vertice);
@@ -60,7 +65,6 @@ public:
     //bool isMultigrafo();
 
     void imprimeSequenciaGraus();
-    void defineCor (Vertice v);
     Vertice achavertice(int id);
 
     GrafoListaAdj algoritmoKruskal();
@@ -69,8 +73,18 @@ public:
     void DFSAux(int i, bool *visitado);
     void DFS();
     bool isBipartido();
+
     void sequenciaGrau();
     bool contemvertice(list<Vertice>S,int idno);
+
+
+    int caminhoMinimoFloyd(int id_origem, int id_destino);
+    int* buscaProfundidade(int vertice_inicial);
+
+    list<int> fechoTransitivoDireto(int id_vertice);
+    list<int> fechoTransitivoIndireto(int id_vertice);
+    list<int> ordenacaoTopologica();
+
 
 };
 

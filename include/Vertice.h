@@ -7,7 +7,7 @@
 
 /*
 *
-*@Author Jo�o Victor Lopes Fam
+*@Author grupo11
 *
 *
 */
@@ -32,8 +32,6 @@ public:
     Vertice(); //contrutor sem parametros
     Vertice(int id); // contrutor passando o id do vertice
     ~Vertice(); // destrutor
-    int getCor();
-    void setCor(int cor);
     int getID(); // retorna o id do vertice
     int getGrau(); // retorna o grau do vertice
 

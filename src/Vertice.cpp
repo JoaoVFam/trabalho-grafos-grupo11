@@ -79,13 +79,8 @@ void Vertice::mostrarVizinhanca() {
 }
 
 
-int Vertice::getCor(){
-    return this->cor;
-}
 
-void Vertice::setCor(int cor){
-    this->cor = cor;
-}
+
 
 bool Vertice::temMultiAresta() {
     return multiAresta;
