@@ -10,7 +10,6 @@ Vertice::Vertice()
 {
     this->contAresta = 0;
     this->grau = 0;
-    this->primeiraAresta = NULL;
     this->cor = 0;
     //contrutor sem par�metros, n�o � feito nada nele
 }
@@ -19,7 +18,6 @@ Vertice::Vertice(int id) {
     //this->contAresta = 0;
     this->grau = 0;
     this->ID = id;
-    this->primeiraAresta = NULL;
     this->cor = 0;
     //contrutor passando o id do vertice
 }
@@ -47,62 +45,35 @@ void Vertice::adicionaAresta(int id_vertice_adjacente) {
         }
     }
     idAdjascentes.push_back(id_vertice_adjacente);
-    Aresta* aresta = new Aresta(id_vertice_adjacente); //instacia novo objeto do tipo aresta
-    aresta->setProx(primeiraAresta);
-    primeiraAresta = aresta;
+    Aresta novaAresta = Aresta(id_vertice_adjacente);
+    this->ListaAresta.push_back(novaAresta);
 }
 
-void Vertice::removeAresta(int id_vertice_adjacente){
-    if(this->primeiraAresta == NULL){
-        cout << "        LISTA VAZIA" << endl;
-    // se j� � o primeiro, desvie o quanto antes para removePrimeiraAresta
-    } else if(this->primeiraAresta->getIdVertice() == id_vertice_adjacente) {
-        this->removePrimeiraAresta();
-        return;
-    } else {
-        Aresta* anterior = primeiraAresta; //inicializa a aresta anterior com a primeira da lista
-        Aresta* atual = anterior->getProx(); //a aresta atual com a pr�xima aresta
-        while(atual != NULL) {
-            if(atual->getIdVertice() == id_vertice_adjacente) {
-                break; //se achou n�o precisa continuar procurando
-            } else { //j� que vai analisar outro item, ent�o atualiza as arestas
-                anterior = atual;
-                atual = atual->getProx();
-            }
+void Vertice::removeAresta(int id_vertice_adjacente) {
+    std::list<Aresta>::iterator i;
+    for (i = ListaAresta.begin(); i != ListaAresta.end(); i++) {
+        if (i->getIdVertice() == id_vertice_adjacente) {
+            ListaAresta.erase(i);
+            grau--;
         }
-        if(atual != NULL) { //se chegou no fim sem achar nada, nada deve ser feito
-            anterior->setProx(atual->getProx()); //atualiza a lista pegando o pr�ximo do atual
-            delete atual; //mata o atual
-            this->grau--;
-        }
+
+
     }
 }
-
 void Vertice::imprimirArestas(){ // imprime os ids dos vertice que esse vertice est� ligado
-    cout << "Lista de arestas (vertice " << this->ID << "): ";
-    for(Aresta* a = this->primeiraAresta; a != NULL; a = a->getProx()){
-        cout << a->getIdVertice() << " ";
+    std::list <Aresta>::iterator i;
+    for(i=ListaAresta.begin();i!=ListaAresta.end();i++){
+
+        cout<< "" << i->getIdVertice();
     }
-    cout << endl;
-}
 
-void Vertice::removePrimeiraAresta() {
-    Aresta* p = this->primeiraAresta;
-    this->primeiraAresta = p->getProx();
-    delete p;
-    this->grau--;
-}
-
-Aresta* Vertice::getListaArestas() {
-    return this->primeiraAresta;
 }
 
 void Vertice::mostrarVizinhanca() {
-    Aresta* p = this->primeiraAresta;
+    std::list <Aresta>::iterator i;
     cout << "Vertices adjacentes ao vertice " << this->getID() << ": ";
-    while(p != NULL) {
-        cout << p->getIdVertice() << " ";
-        p = p->getProx();
+    for (i = ListaAresta.begin(); i != ListaAresta.end(); i++) {
+        cout << i->getIdVertice() << " ";
     }
     cout << endl;
 }

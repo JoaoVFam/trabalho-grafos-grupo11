@@ -5,26 +5,38 @@ using namespace std;
 
 Aresta::Aresta()
 {
-    this->prox = NULL;
-    //construtor sem nenhum parâmetro
+
+    //construtor sem nenhum parï¿½metro
 }
 
 Aresta::Aresta(int id_vertice_adjacente)
 {
     this->id_vertice = id_vertice_adjacente;
-    this->prox = NULL;
+
 }
 
 Aresta::Aresta(int id_vertice_adjacente, int peso_aresta)
 {
     this->id_vertice = id_vertice_adjacente;
     this->peso = peso_aresta;
-    this->prox = NULL;
+
 }
+
+Aresta::Aresta(int idprim, int idsec, int peso) {
+
+    this->id_vertice = idprim;
+    this->id_sec = idsec;
+    this->peso = peso;
+
+
+
+}
+
+
 
 Aresta::~Aresta()
 {
-    delete prox;
+
 }
 
 void Aresta::setIdVertice(int id)
@@ -37,15 +49,6 @@ int Aresta::getIdVertice()
     return this->id_vertice;
 }
 
-Aresta* Aresta::getProx()
-{
-    return prox;
-}
-
-void Aresta::setProx(Aresta* prox)
-{
-    this->prox = prox;
-}
 
 int Aresta::getPeso()
 {
@@ -55,4 +58,9 @@ int Aresta::getPeso()
 void Aresta::setPeso(int peso)
 {
     this->peso = peso;
+}
+void Aresta::getIdSec(int id)
+{
+
+     this->id_sec=id;
 }

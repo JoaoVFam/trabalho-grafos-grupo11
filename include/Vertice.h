@@ -21,14 +21,14 @@ private:
     int ID; // id do vertice
     int grau; // grau do vertice
     int contAresta;
-    Aresta* primeiraAresta; // ponteiro para a primeira aresta da lista
 
-    void removePrimeiraAresta();
+
     int cor; //Cor do vertice
     list <int> idAdjascentes;
     bool multiAresta;
 
 public:
+    list<Aresta>ListaAresta;
     Vertice(); //contrutor sem parametros
     Vertice(int id); // contrutor passando o id do vertice
     ~Vertice(); // destrutor
@@ -42,7 +42,6 @@ public:
 
     void imprimirArestas(); // imprime todas as arestas
 
-    Aresta* getListaArestas(); //retorna o ponteiro para a primeira aresta da lista
 
     bool temMultiAresta();
     void mostrarVizinhanca();

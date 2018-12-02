@@ -1,6 +1,7 @@
 #include "GrafoListaAdj.h"
 #include <list>
-
+#include <algorithm>
+#include "limits.h"
 
 GrafoListaAdj::GrafoListaAdj()
 {
@@ -44,7 +45,8 @@ void GrafoListaAdj::removerVertice(int id) { // remove um vertice da lista de ac
 
 void GrafoListaAdj::adicionarAresta(int id_vertice_1, int id_vertice_2) { // adiciona nas listas de arestas dos dois vertices o id um no outro
     list <Vertice>::iterator it; // iterador de uma lista de vertices
-
+    Aresta novaaresta = Aresta(id_vertice_1,id_vertice_2);
+    this->ArestasGrafo.push_back(novaaresta);
     for(it = this->vertices.begin(); it != this->vertices.end(); ++it){ // itera sobre a lista de vertices do grafo
 
         if(it->getID() == id_vertice_1) // compara o id do vertice com o id 1
@@ -56,7 +58,6 @@ void GrafoListaAdj::adicionarAresta(int id_vertice_1, int id_vertice_2) { // adi
 
 void GrafoListaAdj::removerAresta(int id_vertice_1, int id_vertice_2){ // remove nas listas de arestas dos vertices a aresta que relacionam esses dois vertices
     list <Vertice>::iterator it; // iterador
-
     for(it = this->vertices.begin(); it != this->vertices.end(); ++it){ // itera sobre a lista de vertces do grafo
         if(it->getID() == id_vertice_1) // compara o id do vertice com o id 1
             it->removeAresta(id_vertice_2); // remove a aresta do vertice 1 que representa o vertice 2
@@ -67,7 +68,8 @@ void GrafoListaAdj::removerAresta(int id_vertice_1, int id_vertice_2){ // remove
 
 void GrafoListaAdj::adicionaArestaDirecionada(int id_vertice_saida, int id_vertice_entrada) {
     list <Vertice>::iterator it;
-
+    Aresta novaaresta = Aresta(id_vertice_entrada,id_vertice_saida);
+    this->ArestasGrafo.push_back(novaaresta);
     for(it = this->vertices.begin(); it != this->vertices.end(); ++it) {
         if(it->getID() == id_vertice_saida) {
             it->adicionaAresta(id_vertice_entrada);
@@ -212,7 +214,7 @@ void GrafoListaAdj::imprimeSequenciaGraus() {
     cout << endl;
 }
 
-/* TODO: acertar bug que está ocorrendo nesta função abaixo que foi comentada
+// TODO: acertar bug que está ocorrendo nesta função abaixo que foi comentada
 void GrafoListaAdj::defineCor(Vertice v){
     list <Vertice>::iterator it1;
     list<Aresta>::iterator it2;
@@ -222,7 +224,7 @@ void GrafoListaAdj::defineCor(Vertice v){
 
         }
     }
-} */
+}
 
 int GrafoListaAdj::getPesoAresta(int id_vertice_1, int id_vertice_2)
 {
@@ -279,14 +281,6 @@ void GrafoListaAdj::adicionaPesoAresta(int id_vertice_1, int id_vertice_2, int p
 }
 
 
-GrafoListaAdj GrafoListaAdj::algoritmoKruskal() {
-    GrafoListaAdj mst; //minimal spanning tree
-    list<Vertice>::iterator it;
-    for(it = vertices.begin(); it != vertices.end(); ++it) {
-        mst.adicionarVertice(it->getID());
-    }
-}
-
 
 
 bool GrafoListaAdj::isBipartido()
@@ -307,10 +301,10 @@ bool GrafoListaAdj::isBipartido()
             cores[indice]=1;
         }
         int aux;
-        Aresta* p= it->getListaArestas();
-        while(p=!"null")  //percorre a lista de adjacencias do vertice atual
+        list <Aresta>::iterator it2;
+        for(it2 =it->ListaAresta.begin() ; it2 != it->ListaAresta.end(); ++it)
         {
-            aux=p->getIdVertice(); // armazena id do vertice adjacente pra verificar no vetor de cores a cor do mesmo
+            aux=it2->getIdVertice(); // armazena id do vertice adjacente pra verificar no vetor de cores a cor do mesmo
             if(cores[aux]==-1)   //se o vertice não tiver colorido
              {
                 cores[aux]=1-cores[indice];  // colore-se com a cor contraria
@@ -318,11 +312,228 @@ bool GrafoListaAdj::isBipartido()
             {
                 return false;
             }
-            p=p->getProx();
+
         }
         return true; //caso tenha percorrido o grafo sem achar vertices ligados com a mesma cor o grafo é bipartido
     }
 
+}
+
+GrafoListaAdj GrafoListaAdj::algoritmoKruskal()
+{
+
+        GrafoListaAdj arvore;
+        list<Vertice> solucaov;
+        int qtd = this->vertices.size()-1;
+        int i;
+        int no1,no2;
+        bool n1,n2;
+        Vertice *aux;
+        list<Aresta>Candidatas = this->ArestasGrafo;
+        Candidatas.sort([](Aresta *aresta1, Aresta *aresta2) {
+        return aresta1->getPeso() < aresta2->getPeso();
+    });
+        list <Aresta>::iterator it;
+        list<Vertice>::iterator it2;
+        for(i=0;i<qtd;i++)
+        {
+            no1 = Candidatas.begin()->getIdVertice();
+            no2 = Candidatas.begin()->getIdSec();
+            n1= (std::find(solucaov.begin(), solucaov.end(), no1) != solucaov.end());
+            n2= (std::find(solucaov.begin(), solucaov.end(), no2) != solucaov.end());
+
+            if(!n1 && !n2)
+            {
+                solucaov.push_back(achavertice(no2));
+                solucaov.push_back(achavertice(no1));
+                arvore.ArestasGrafo.push_back(Candidatas.front());
+                Candidatas.pop_front();
+
+            }
+            if(n1 && !n2)
+            {
+                int verifica = 0;
+                it2=vertices.begin();
+                bool teste;
+                while(it2->getID()!= no2)
+                {
+                    it2++;
+                }
+                for(it = it2->ListaAresta.begin();it != it2->ListaAresta.end(); ++it)
+                {
+
+                    teste= (std::find(solucaov.begin(), solucaov.end(), it2) != solucaov.end());
+                    if(teste) verifica++;
+
+                }
+                if(verifica==0)
+                {
+                    arvore.ArestasGrafo.push_back(Candidatas.front());
+                    Candidatas.pop_front();
+                    solucaov.push_back(achavertice(no2));
+
+                }else
+                {
+                    Candidatas.pop_front();
+                }
+
+
+
+            }
+            if(n2==true && n1==false)
+            {
+                int verifica = 0;
+                it2=vertices.begin();
+                bool teste;
+                while(it2->getID()!= n1)
+                {
+                    it2++;
+                }
+                for(it = it2->ListaAresta.begin();it != it2->ListaAresta.end(); ++it)
+                {
+
+                    teste= (std::find(solucaov.begin(), solucaov.end(), it2) != solucaov.end());
+                    if(teste==true) verifica++;
+
+                }
+                if(verifica==0)
+                {
+                    arvore.ArestasGrafo.push_back(Candidatas.front());
+                    Candidatas.pop_front();
+                    solucaov.push_back(achavertice(no1));
+                }else
+                {
+                    Candidatas.pop_front();
+                }
+            }
+        }
+
+}
+
+GrafoListaAdj GrafoListaAdj::algoritmoPrim(Vertice v)
+{
+
+     GrafoListaAdj Primsolut;
+     int tam = this->vertices.size();
+     list<Aresta>Candidatas;
+     list<Aresta>Solucao;
+     list<Vertice>Solut;
+     int idno;
+     Vertice *vc;
+     vc =&v;
+     Aresta arestaux;
+     list<Vertice>::iterator it;
+     list<Aresta>::iterator ita;
+
+     while(Solut.size()<tam) // loop pra cobrir todos os vertices
+     {
+         int controle =0;
+         for(ita=vc->ListaAresta.begin();ita!=vc->ListaAresta.end();ita++)
+         {
+              ita->setIdSec(ita->getIdVertice());
+         }
+         Candidatas.sort([](Aresta *aresta1, Aresta *aresta2) {
+             return aresta1->getPeso() < aresta2->getPeso();
+         });
+         for(it= Solut.begin();it!=Solut.end();it++)
+         {
+             if(Candidatas.begin()->getIdVertice()==it->getID())
+             {
+                 controle++;
+             }
+
+         }
+         if(controle!=0)
+         {
+             Candidatas.pop_front();
+         }else {
+
+
+             Primsolut.adicionarVertice(Candidatas.front().getIdVertice());
+             Primsolut.adicionarVertice(Candidatas.front().getIdSec());
+             Primsolut.adicionarAresta(Candidatas.front().getIdSec(),Candidatas.front().getIdVertice());
+             Solut.push_back(v);
+             idno = Candidatas.front().getIdVertice();
+             it = this->vertices.begin();
+             while (it->getID() != idno) {
+                 it++;
+             }
+             vc = &*it;
+             Candidatas.pop_front();
+
+         }
+     }
+
+
+}
+void GrafoListaAdj::algoritimoDjsktra(Vertice c)
+{
+    list<Vertice> S = this->vertices;
+    int i;
+    int tam = this->vertices.size();
+    int distancia[tam];
+    bool visitado[tam];
+    for(i=0;i<tam;i++)
+    {
+        visitado[i]=false;
+        distancia[i]= INT_MAX;
+    }
+    distancia[c.getID()]=0;
+    while (!S.empty())
+    {
+        if(visitado[S.front().getID()]==false)
+        {
+            visitado[S.front().getID()]= true;
+            list<Aresta>::iterator it;
+            for(it=S.front().ListaAresta.begin();it!=S.front().ListaAresta.end();it++)
+            {
+                if(it->getPeso()+distancia[S.front().getID()]<distancia[it->getIdVertice()])
+                {
+                    distancia[it->getIdVertice()] = it->getPeso()+distancia[S.front().getID()];
+                }
+
+            }
+        }
+        S.pop_front();
+
+    }
+
+
+
+}
+void GrafoListaAdj::DFS() {
+
+    int tam,i;
+    tam = this->vertices.size();
+    bool visitados = new bool [tam];
+    for(i=0;i<tam;i++)
+    {
+        visitados[i]= false;
+    }
+    for(i=0;i<tam;i++)
+    {
+        if(visitados[i]==false)
+        {
+            DFSAux(i,visitados[]);
+        }
+    }
+
+}
+
+void GrafoListaAdj::DFSAux(int i, bool *visitado) {
+
+    visitado[i] = true;
+
+    list<Vertice>::iterator it = this->vertices.begin();
+    advance(it, i);
+    list<Aresta>::iterator it2;
+    for (it2 = it->ListaAresta.begin(); it2 != it->ListaAresta.end(); it2++) {
+
+        if (!visitado[it->getID()] == false) {
+            DFSAux(it2->getIdVertice(), visitado);
+        }
+
+    }
 }
 
 void GrafoListaAdj::setNulo() {
@@ -355,3 +566,15 @@ void GrafoListaAdj::sequenciaGrau() {
     }
     cout<<"]" <<endl;
 }
+Vertice GrafoListaAdj::achavertice(int id)
+{
+    list <Vertice>::iterator it;
+    it = this->vertices.begin();
+    while (it->getID() != id) {
+        it++;
+    }
+    return *it;
+
+
+}
+

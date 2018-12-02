@@ -17,6 +17,7 @@ class GrafoListaAdj
 {
 private:
     list <Vertice> vertices; //lista de vertices que compoem o grafo
+    list<Aresta> ArestasGrafo;
     int k; //Quantidade de cores
     bool trivial;
     bool nulo = false;
@@ -60,8 +61,13 @@ public:
 
     void imprimeSequenciaGraus();
     void defineCor (Vertice v);
+    Vertice achavertice(int id);
 
     GrafoListaAdj algoritmoKruskal();
+    GrafoListaAdj algoritmoPrim(Vertice c);
+    void algoritimoDjsktra(Vertice c);
+    void DFSAux(int i, bool *visitado);
+    void DFS();
     bool isBipartido();
     void sequenciaGrau();
 
